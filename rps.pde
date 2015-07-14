@@ -70,25 +70,33 @@ boolean pointInRect(float px, float py, float rx, float ry, float rw, float rh) 
   //else return false;
 }
 
-void mouseReleased() {
-  int curTime = millis(), AIMov;
-  if (curTime - lastMoveTime <= moveDispDur) return;
-  for (int i = 0; i < 3; ++i)
-    if (pointInRect(mouseX, mouseY, iconX[i], iconY[i], iconSize, iconSize)) {
-      lastMoveTime = curTime;
-      AIMov = AI_move();
-      cmptMov.append(AIMov);
-      plyrMov.append(i);
-      switch (win[i][AIMov]) {
-        case 1: ++plyrScore; break;
-        case 0: break;
-        case -1: ++cmptScore; break;
-      }
-      break;
-    }
+void doMove(int idx) {
+  lastMoveTime = millis();
+  int AIMov = AI_move();
+  cmptMov.append(AIMov);
+  plyrMov.append(idx);
+  switch (win[idx][AIMov]) {
+    case 1: ++plyrScore; break;
+    case 0: break;
+    case -1: ++cmptScore; break;
+  }
 }
 
-int AI_consideration = 9;
+void mouseReleased() {
+  if (millis() - lastMoveTime <= moveDispDur) return;
+  for (int i = 0; i < 3; ++i) if (pointInRect(mouseX, mouseY, iconX[i], iconY[i], iconSize, iconSize)) {
+    doMove(i); break;
+  }
+}
+
+void keyPressed() {
+  if (millis() - lastMoveTime <= moveDispDur) return;
+  for (int i = 0; i < 3; ++i) if (keyCode == 49 + i) {
+    doMove(i); break;
+  }
+}
+
+int AI_consideration = 12;
 int AI_move() {
   float[] count = new float[3];
   float sum = 0;
