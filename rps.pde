@@ -120,7 +120,6 @@ int AI_move() {
   for (int i = 0; i < 3; ++i) sum += count[i];
   for (int i = 0; i < 3; ++i) count[i] /= sum;
   // count is now the possibility that player will take this next
-  println(count[0], count[1], count[2]);
   sum = random(1);
   // sum is now the randomly generated number for the decision
   if (sum < count[0]) return 2;
