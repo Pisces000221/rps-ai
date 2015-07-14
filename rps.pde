@@ -1,5 +1,5 @@
-IntList plyrMov = new IntList(32);
-IntList cmptMov = new IntList(32);
+int[] plyrMov = new int[12];
+int[] cmptMov = new int[12];
 int plyrScore = 0, cmptScore = 0;
 int[][] win = new int[][] { {0, 1, -1}, {-1, 0, 1}, {1, -1, 0} };
 int moveDispDur = 1000;
@@ -14,6 +14,7 @@ void setup() {
   strokeWeight(10);
   ellipseMode(CORNER);
   fill(0, 0);
+  for (int i = 0; i < 12; ++i) plyrMov[i] = cmptMov[i] = -1;
   iconX[0] = width * 1 / 6 - iconSize / 2;
   iconX[1] = width * 3 / 6 - iconSize / 2;
   iconX[2] = width * 5 / 6 - iconSize / 2;
@@ -42,8 +43,8 @@ void draw() {
 
   if (millis() - lastMoveTime <= moveDispDur) {
     // Display the moves
-    int plyrLastMove = plyrMov.get(plyrMov.size() - 1),
-        cmptLastMove = cmptMov.get(cmptMov.size() - 1);
+    int plyrLastMove = plyrMov[11],
+        cmptLastMove = cmptMov[11];
     drawIcon(plyrLastMove, iconSize / 2, height / 2 - iconSize, plyrColour);
     drawIcon(cmptLastMove, width - iconSize * 3 / 2, height / 2 - iconSize, cmptColour);
     noStroke();
@@ -73,8 +74,12 @@ boolean pointInRect(float px, float py, float rx, float ry, float rw, float rh) 
 void doMove(int idx) {
   lastMoveTime = millis();
   int AIMov = AI_move();
-  cmptMov.append(AIMov);
-  plyrMov.append(idx);
+  for (int i = 0; i < 11; ++i) {
+    cmptMov[i] = cmptMov[i + 1];
+    plyrMov[i] = plyrMov[i + 1];
+  }
+  cmptMov[11] = AIMov;
+  plyrMov[11] = idx;
   switch (win[idx][AIMov]) {
     case 1: ++plyrScore; break;
     case 0: break;
@@ -100,8 +105,8 @@ int AI_consideration = 12;
 int AI_move() {
   float[] count = new float[3];
   float sum = 0;
-  for (int i = max(0, plyrMov.size() - AI_consideration); i < plyrMov.size(); ++i) {
-    ++count[plyrMov.get(i)]; ++sum;
+  for (int i = 0; i < 12; ++i) if (plyrMov[i] >= 0) {
+    ++count[plyrMov[i]]; ++sum;
   }
 
   // f(x) = 0.325 - x / 4      (0 <= x <= 0.5)
